@@ -1,7 +1,7 @@
-import os
-import secrets
+import os, secrets
+from PIL import Image
 from flask import render_template, url_for, flash, redirect, request
-from flaskblog.forms import RegistraionForm, LoginForm, UpdateAccountForm
+from flaskblog.forms import RegistraionForm, LoginForm, UpdateAccountForm, PostForm
 from flaskblog import app, bcrypt, db
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
@@ -61,6 +61,10 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user, remember= form.remember.data)
+                # when redirected to login page from any other page this piece of code will redirect to
+                # the page you were redirected from, to the login page
+                # e.g. trying to access account page without logging in, you'll get redirected to login page
+                # and when you'll login you will be redirected back to account page.
                 next_page = request.args.get('next')
                 return redirect(next_page)  if next_page else redirect(url_for('home'))
         else:
@@ -72,13 +76,21 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+# Function to generate a random 8 digit name for the picture file, returns the new file name.
+# and saves the image to the local folder (static/Profile_Pictures) in our case.
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
     f_name, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
-    form_picture.save(picture_path)
+    picture_path = os.path.join(app.root_path, 'static/Profile_Pictures', picture_fn)
+    
+
+    # Resizing all images to a specific size that is 125x125px and saving resized filed locally.
+    output_size = (125, 125)
+    i = Image.open(form_picture)
+    i.resize(output_size)
+    i.save(picture_path)
 
     return picture_fn
 
@@ -103,4 +115,11 @@ def account():
     return render_template('account.html', title='Account', image_file = image_file, form=form)
 
     
-
+@app.route("/post/new", methods=['POST', 'GET'])
+@login_required
+def new_post():
+    form = PostForm()
+    if form.validate_on_submit():
+         flash('Your post has been successfully created!')
+         return(redirect(url_for('home')))
+    return render_template('create_post.html', title='new post')
