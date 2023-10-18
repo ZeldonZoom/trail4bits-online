@@ -112,11 +112,15 @@ def new_post():
 @app.route("/post/<int:post_id>")
 def post(post_id):
      post = Post.query.get_or_404(post_id)
-     return render_template('post.html', title='post.title', post=post)
+     return render_template('post.html', title=post.title, post=post)
 
 @app.route("/post/<int:post_id>/update")
 @login_required
 def update_post(post_id):
+    form=PostForm()
     post = Post.query.get_or_404(post_id)
     if post.author != current_user:
          abort(403)
+    form.title.data=post.title
+    form.content.data=post.content
+    return render_template('create_post.html', title='Update Post', post=post, form=form)
