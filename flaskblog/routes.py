@@ -96,7 +96,10 @@ def account():
     image_file = url_for('static', filename='Profile_Pictures/'+f'{current_user.image_file}')
     return render_template('account.html', title='Account', image_file = image_file, form=form)
 
-    
+
+
+# This route directs user to a new page where user can create a new post.
+# Uses the create_post.html template
 @app.route("/post/new", methods=['POST', 'GET'])
 @login_required
 def new_post():
@@ -107,14 +110,19 @@ def new_post():
          db.session.commit()
          flash('Your post has been successfully created!')
          return(redirect(url_for('home')))
-    return render_template('create_post.html', title='new post', form=form)
+    return render_template('create_post.html', title='New post', form=form)
 
+
+# This route directs user to a new page where user can see the post, (this route gets the post from the db using post_id).
 @app.route("/post/<int:post_id>")
 def post(post_id):
      post = Post.query.get_or_404(post_id)
-     return render_template('post.html', title=post.title, post=post)
+     return render_template('post.html', title=post.title, post=post, legend='New Post')
 
-@app.route("/post/<int:post_id>/update")
+
+# This route directs user to a new page where user can see and update the post, (gets the post from the db using post_id).
+# Uses the same template as create post template.
+@app.route("/post/<int:post_id>/update", methods=['POST', 'GET'])
 @login_required
 def update_post(post_id):
     form=PostForm()
@@ -123,4 +131,4 @@ def update_post(post_id):
          abort(403)
     form.title.data=post.title
     form.content.data=post.content
-    return render_template('create_post.html', title='Update Post', post=post, form=form)
+    return render_template('create_post.html', title='Update Post', post=post, form=form, legend='Update Post')
