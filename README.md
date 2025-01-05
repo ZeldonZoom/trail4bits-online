@@ -79,8 +79,8 @@ python run.py
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
--Flask documentation and community
--Bootstrap team for the excellent UI framework
--Flask documentation and community
--Corey Schafer for his Flask YouTube playlist, which provided invaluable guidance and inspiration for this project
--All contributors who help improve this project
+- Flask documentation and community
+- Bootstrap team for the excellent UI framework
+- Flask documentation and community
+- Corey Schafer for his Flask YouTube playlist, which provided invaluable guidance and inspiration for this project
+- All contributors who help improve this project
